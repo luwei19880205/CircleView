@@ -1,0 +1,164 @@
+package com.funo.livelihood.widget;
+
+import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
+import android.text.TextUtils;
+import android.util.AttributeSet;
+import android.view.View;
+
+/**
+ * CircleView 自定义圆形进度条
+ * @author lw
+ * @date 2017/6/1
+ */
+
+public class CircleView extends View {
+
+    private int mMaxProgress = 100;
+
+    private int mProgress = 30;
+
+    private final int mBgCircleStrokeWidth = 2;
+    private final int mCircleLineStrokeWidth = 6;
+    private final int mShadowStrokeWidth = 12;
+
+    private final int mTxtStrokeWidth = 4;
+
+    private final Paint mPaint;
+
+    private final Context mContext;
+
+    private String mTxtHint1;
+
+    private int bgColor = Color.BLUE;
+    private int progressColor = Color.RED;
+    private int shadowColor = Color.parseColor("#16aAaD");
+
+    public CircleView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+
+        mContext = context;
+        mPaint = new Paint();
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        int width = this.getWidth();
+        int height = this.getHeight();
+
+        if (width != height) {
+            int min = Math.min(width, height);
+            width = min;
+            height = min;
+        }
+
+        // 设置画笔相关属性
+        mPaint.setAntiAlias(true);//抗锯齿
+        canvas.drawColor(Color.TRANSPARENT);
+        mPaint.setStyle(Paint.Style.STROKE);//空心
+
+        // 绘制圆圈，当前进度阴影
+//        RectF shadowRectF = new RectF(mShadowStrokeWidth / 2, mShadowStrokeWidth / 2 + 16, width - mShadowStrokeWidth / 2, height - mShadowStrokeWidth / 2 + 16);
+//        mPaint.setStrokeWidth(mShadowStrokeWidth);
+//        mPaint.setColor(shadowColor);
+//        canvas.drawArc(shadowRectF, 0, ((float) mProgress / mMaxProgress) * 360, false, mPaint);
+
+        // 绘制圆圈，进度条背景
+        RectF bgRectF = new RectF(mBgCircleStrokeWidth / 2, mBgCircleStrokeWidth / 2, width - mBgCircleStrokeWidth / 2, height - mBgCircleStrokeWidth / 2);
+        mPaint.setStrokeWidth(mBgCircleStrokeWidth);
+        mPaint.setColor(bgColor);
+        canvas.drawArc(bgRectF, 0, 360, false, mPaint);
+
+        // 绘制圆圈，当前进度
+        RectF rectF = new RectF(mCircleLineStrokeWidth / 2, mCircleLineStrokeWidth / 2, width - mCircleLineStrokeWidth / 2, height - mCircleLineStrokeWidth / 2);
+        mPaint.setStrokeWidth(mCircleLineStrokeWidth);
+        mPaint.setColor(progressColor);
+        canvas.drawArc(rectF, 0, ((float) mProgress / mMaxProgress) * 360, false, mPaint);
+
+
+        // 绘制进度文案显示
+        mPaint.setStrokeWidth(mTxtStrokeWidth);
+        String text = mProgress + "";
+        int textHeight = height / 3;
+        mPaint.setTextSize(textHeight);
+        mPaint.setColor(Color.WHITE);
+        int textWidth = (int) mPaint.measureText(text, 0, text.length());
+        mPaint.setStyle(Paint.Style.FILL);
+        String text2 = "%";
+        int textWidth2 = (int) mPaint.measureText(text2, 0, text2.length());
+        canvas.drawText(text, width / 2 - textWidth / 2 - textWidth2 / 4, height / 2 , mPaint);
+
+        mPaint.setTextSize(height / 6);
+        canvas.drawText(text2, width / 2 + textWidth / 2 - textWidth2 / 4 + 8, height / 2 , mPaint);//绘制%
+
+        if (!TextUtils.isEmpty(mTxtHint1)) {
+            mPaint.setStrokeWidth(mTxtStrokeWidth);
+            text = mTxtHint1;
+            textHeight = height / 8;
+            mPaint.setTextSize(textHeight);
+            mPaint.setColor(Color.rgb(0xff, 0xff, 0xff));
+            textWidth = (int) mPaint.measureText(text, 0, text.length());
+            mPaint.setStyle(Paint.Style.FILL);
+            canvas.drawText(text, width / 2 - textWidth / 2, height/2 + textHeight + 20, mPaint);
+        }
+
+    }
+
+    public int getMaxProgress() {
+        return mMaxProgress;
+    }
+
+    public void setMaxProgress(int maxProgress) {
+        this.mMaxProgress = maxProgress;
+    }
+
+    public void setProgress(int progress) {
+        this.mProgress = progress;
+        this.invalidate();
+    }
+
+    public void setProgressNotInUiThread(int progress) {
+        this.mProgress = progress;
+        this.postInvalidate();
+    }
+
+    public String getmTxtHint1() {
+        return mTxtHint1;
+    }
+
+    /**
+     * 设置圈内上方文字
+     * @param mTxtHint1
+     */
+    public void setmTxtHint1(String mTxtHint1) {
+        this.mTxtHint1 = mTxtHint1;
+    }
+
+    public int getProgressColor() {
+        return progressColor;
+    }
+
+    /**
+     * 设置进度条颜色
+     * @param progressColor
+     */
+    public void setProgressColor(int progressColor) {
+        this.progressColor = progressColor;
+    }
+
+    public int getBgColor() {
+        return bgColor;
+    }
+
+    /**
+     * 设置进度条背景颜色
+     * @param bgColor
+     */
+    public void setBgColor(int bgColor) {
+        this.bgColor = bgColor;
+    }
+}
